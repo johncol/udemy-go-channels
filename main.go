@@ -13,17 +13,26 @@ var urls = []string{
 }
 
 func main() {
+	channel := make(chan bool)
+
 	for _, url := range urls {
-		reportStatus(url)
+		go reportStatus(url, channel)
+	}
+
+	
+	for i := 1; i <= len(urls); i++ {
+		fmt.Println(<- channel)
 	}
 }
 
-func reportStatus(url string)  {
-	if websiteIsUp(url) {
-		fmt.Println("OK", url, "is up and running!")
+func reportStatus(url string, channel chan bool)  {
+	isUp := websiteIsUp(url)
+	if isUp {
+		fmt.Println(" --- OK", url, "is up and running!")
 	} else {
-		fmt.Println("WARN", url, "did not respond..")
+		fmt.Println(" --- WARN", url, "did not respond..")
 	}
+	channel <- isUp
 }
 
 func websiteIsUp(url string) bool {
