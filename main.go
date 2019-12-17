@@ -21,7 +21,7 @@ func main() {
 
 	
 	for i := 1; i <= len(urls); i++ {
-		fmt.Println(<- channel)
+		_ = <-channel
 	}
 }
 
