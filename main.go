@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
-// Url x
-type Url = string
+// URL x
+type URL = string
 
-var urls = []Url{
+var urls = []URL{
 	"http://google.com",
 	"http://facebook.com",
 	"http://golang.org",
@@ -16,19 +17,21 @@ var urls = []Url{
 }
 
 func main() {
-	channel := make(chan Url)
+	channel := make(chan URL)
 
 	for _, url := range urls {
 		go reportStatus(url, channel)
 	}
 
-	
 	for url := range channel {
-		go reportStatus(url, channel)
+		go func(url URL) {
+			time.Sleep(5*time.Second)
+			reportStatus(url, channel)
+		}(url)
 	}
 }
 
-func reportStatus(url Url, channel chan Url)  {
+func reportStatus(url URL, channel chan URL)  {
 	if websiteIsUp(url) {
 		fmt.Println(" --- OK", url, "is up and running!")
 	} else {
@@ -37,7 +40,7 @@ func reportStatus(url Url, channel chan Url)  {
 	channel <- url
 }
 
-func websiteIsUp(url Url) bool {
+func websiteIsUp(url URL) bool {
 	_, err := http.Get(url)
 	return err == nil
 }
